@@ -3,8 +3,10 @@ import sys
 
 
 def read_file(file: str) -> list[str]:
-    f = open(file, "r")
-    if f == None:
+    try:
+        f = open(file, "r")
+    except FileNotFoundError:
+        print(f"file '{file}' was not found.", file=sys.stderr)
         return []
 
     lines = f.readlines()
@@ -19,8 +21,11 @@ def main():
         print(f"usage: {sys.argv[0]} kysymykset.txt", file=sys.stderr)
         return
 
+    questions = read_file(sys.argv[1])
+    if len(questions) == 0:
+        return
+
     delim=": "
-    questions = read_file("./sivistyssanat.txt")
     failed = 0
     fq = []
     for q in questions:
@@ -35,8 +40,8 @@ def main():
             print()
             continue
         print(f"\033[31mCorrect answer: \033[0m{cans}")
-        vq = "My answer and given correct answer correlate rather in positive way (y/n): "
-        if str(input(vq)).lower() == "n":
+        vq = "My answer and the given correct answer correlate rather in positive way (y/n): "
+        if str(input(vq)).lower() != "y":
             failed += 1
             selitys = ": ".join(x[1:])
             fq.append(f"{x[0]} ({selitys})")
